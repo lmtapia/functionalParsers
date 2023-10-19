@@ -1,5 +1,7 @@
 module Parsers.Elementary where
 
+import Prelude hiding ((<*>),(<|>),(<$>))
+
 type Parser symbol result = [symbol] -> [(result, [symbol])]
 
 -- Elementary parsers
@@ -21,4 +23,7 @@ failp :: Parser s a
 failp xs = []
 
 succeed :: a -> Parser s a
-succeed r xs = [ (r, xs)]
+succeed r xs = [(r, xs)]
+
+epsilon :: Parser s ()
+epsilon xs = [((), xs)]
