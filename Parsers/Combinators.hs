@@ -43,5 +43,20 @@ many1 p = list <$> p <*> many p
 pack :: Parser s o -> Parser s a -> Parser s c -> Parser s a
 pack p r q = (\x y z -> y) <$> p <*> r <*> q
 
+parenthesised p = pack (symbol '(') p (symbol ')')
+
 listOf     :: Parser s a -> Parser s b -> Parser s [a]
 listOf p s = list <$> p <*> many ((\x y -> y) <$> s <*> p)
+
+commaList p = listOf p (symbol ',')
+-- Chain expressions combinators
+
+chainr :: Parser s a -> Parser s (a -> a -> a) -> Parser s a
+chainr pe po = h <$> many (j <$> pe <*> po) <*> pe 
+  where j x op = (x `op`)
+        h fs x = foldr ($) x fs 
+
+chainl :: Parser s a -> Parser s (a -> a -> a) -> Parser s a
+chainl pe po = h <$> pe <*> many (j <$> po <*> pe) 
+  where j op x =  (`op` x)
+        h x fs = foldl (flip ($)) x fs

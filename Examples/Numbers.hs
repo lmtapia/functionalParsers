@@ -13,3 +13,6 @@ digit2Int = f <$> digit
 
 decimal :: Parser Char Int 
 decimal = foldl1 (\x y -> x*10 + y)  <$> many1 digit2Int
+
+integer :: Parser Char Int 
+integer = option ((\c -> (0 -)) <$> symbol '-') (0 +) <*> decimal
