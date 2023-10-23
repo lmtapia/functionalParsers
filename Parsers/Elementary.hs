@@ -4,6 +4,10 @@ import Prelude hiding ((<*>),(<|>),(<$>))
 
 type Parser symbol result = [symbol] -> [(result, [symbol])]
 
+maybeHead :: [a] -> Maybe a
+maybeHead [] = Nothing  
+maybeHead xs = Just (head xs)
+
 -- Elementary parsers
 symbol :: Eq s => s -> Parser s s
 symbol a (b:bs) = if b == a then [(b,bs)] else []

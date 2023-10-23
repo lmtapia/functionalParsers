@@ -19,8 +19,8 @@ identifier = many1 (satisfy isAlpha)
 
 fact :: Parser Char Expr
 fact =  Con <$> integer
-      <|> Var <$> identifier
       <|> Fun <$> identifier <*> parenthesised (commaList expr)
+      <|> Var <$> identifier
       <|> parenthesised expr
 
 
@@ -37,3 +37,9 @@ expr = chainr term
               )
 
 
+multis = [('*',(:*:)), ('/',(:*:))]  
+addis  = [('+',(:+:)), ('-',(:-:))]
+
+-- HINT:  expr = gen (gen fact multis) sums 
+expr' :: Parser Char Expr
+expr' = foldr gen fact [addis, multis]

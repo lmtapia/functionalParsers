@@ -49,6 +49,12 @@ listOf     :: Parser s a -> Parser s b -> Parser s [a]
 listOf p s = list <$> p <*> many ((\x y -> y) <$> s <*> p)
 
 commaList p = listOf p (symbol ',')
+
+-- combinators for repetition
+choice :: [Parser s a] -> Parser s a
+choice ps = foldr (<|>) failp ps
+
+
 -- Chain expressions combinators
 
 chainr :: Parser s a -> Parser s (a -> a -> a) -> Parser s a
@@ -60,3 +66,9 @@ chainl :: Parser s a -> Parser s (a -> a -> a) -> Parser s a
 chainl pe po = h <$> pe <*> many (j <$> po <*> pe) 
   where j op x =  (`op` x)
         h x fs = foldl (flip ($)) x fs
+
+type Op a = (Char, a -> a -> a)
+
+gen :: [Op a] -> Parser Char a -> Parser Char a
+gen ops p  =  chainr p (choice (map f ops))
+  where f (s,c) = const c <$> symbol s
